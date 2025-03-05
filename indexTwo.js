@@ -61,3 +61,9 @@ function error(msg, includeHelp = false) {
     printHelp();
   }
 }
+
+var stream1; // readable stream
+var stream2; // writable stream
+var stream3; // readable stream
+
+stream3 = stream1.pipe(stream2).pipe(stream5).pipe(final);
