@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const args = minimist(process.argv.slice(2), {
-  boolean: ["help", "in", "out", "compress"],
+  boolean: ["help", "in", "out", "compress", "uncompress"],
   string: ["file"],
 });
 
@@ -36,6 +36,11 @@ if (args.help) {
 
 function processFile(inStream) {
   var outStream = inStream;
+
+  if (args.uncompress) {
+    let gunzipStream = zlib.createGunzip();
+    outStream = outStream.pipe(gunzipStream);
+  }
 
   var upperStream = new Transform({
     transform(chunk, encoding, cb) {
@@ -62,13 +67,14 @@ function processFile(inStream) {
 }
 
 function printHelp() {
-  console.log("index usage:");
-  console.log(" index.js --file={FILENAME}");
+  console.log("indexTwo usage:");
+  console.log(" indexTwo.js --file={FILENAME}");
   console.log("");
   console.log("--file                 file to process {FILENAME}");
   console.log("--help                 print this help");
   console.log("--out                  print to stdout");
   console.log("--compress             compress output with gzip");
+  console.log("--uncompress           uncompress gzip input");
   console.log("");
 }
 
