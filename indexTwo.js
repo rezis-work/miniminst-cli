@@ -2,8 +2,8 @@
 
 import path from "path";
 import fs from "fs";
-import getStdin from "get-stdin";
 import minimist from "minimist";
+import { Transform } from "stream";
 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -33,6 +33,18 @@ if (args.help) {
 
 function processFile(inStream) {
   var outStream = inStream;
+
+  var upperStream = new Transform({
+    transform(chunk, encoding, cb) {
+      this.push(chunk.toString().toUpperCase());
+      setTimeout(() => {
+        cb();
+      }, 200);
+    },
+  });
+
+  outStream = outStream.pipe(upperStream);
+
   var targetStream = process.stdout;
   outStream.pipe(targetStream);
 }
