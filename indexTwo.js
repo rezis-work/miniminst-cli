@@ -20,7 +20,7 @@ const BASE_PATH = path.resolve(process.env.BASE_PATH || __dirname);
 
 if (args.help) {
   printHelp();
-} else if (args.in) {
+} else if (args.in || args._.includes("-")) {
   getStdin().then(processFile).catch(error);
 } else if (args.file) {
   fs.readFile(
