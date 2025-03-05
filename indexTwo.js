@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import minimist from "minimist";
 import { Transform } from "stream";
+import zlib from "zlib";
 
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -12,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const args = minimist(process.argv.slice(2), {
-  boolean: ["help", "in", "out"],
+  boolean: ["help", "in", "out", "compress"],
   string: ["file"],
 });
 
@@ -45,6 +46,12 @@ function processFile(inStream) {
 
   outStream = outStream.pipe(upperStream);
 
+  if (args.compress) {
+    let gzipStream = zlib.createGzip();
+    outStream = outStream.pipe(gzipStream);
+    OUTFILE = `${OUTFILE}.gz`;
+  }
+
   var targetStream;
   if (args.out) {
     targetStream = process.stdout;
@@ -61,6 +68,7 @@ function printHelp() {
   console.log("--file                 file to process {FILENAME}");
   console.log("--help                 print this help");
   console.log("--out                  print to stdout");
+  console.log("--compress             compress output with gzip");
   console.log("");
 }
 
