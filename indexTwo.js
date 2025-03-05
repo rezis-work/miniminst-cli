@@ -21,28 +21,20 @@ const BASE_PATH = path.resolve(process.env.BASE_PATH || __dirname);
 if (args.help) {
   printHelp();
 } else if (args.in || args._.includes("-")) {
-  getStdin().then(processFile).catch(error);
+  processFile(process.stdin);
 } else if (args.file) {
-  fs.readFile(
-    path.join(BASE_PATH, args.file),
-    "utf8",
-    function onContents(err, contents) {
-      if (err) {
-        error(err.toString(), true);
-      } else {
-        processFile(contents);
-      }
-    }
-  );
+  let stream = fs.createReadStream(path.join(BASE_PATH, args.file), "utf8");
+  processFile(stream);
 } else {
   error("Incorrect usage", true);
 }
 
 // ***********************************************
 
-function processFile(contents) {
-  contents = contents.toUpperCase();
-  process.stdout.write(contents);
+function processFile(inStream) {
+  var outStream = inStream;
+  var targetStream = process.stdout;
+  outStream.pipe(targetStream);
 }
 
 function printHelp() {
@@ -61,9 +53,3 @@ function error(msg, includeHelp = false) {
     printHelp();
   }
 }
-
-var stream1; // readable stream
-var stream2; // writable stream
-var stream3; // readable stream
-
-stream3 = stream1.pipe(stream2).pipe(stream5).pipe(final);
