@@ -17,6 +17,12 @@ const args = minimist(process.argv.slice(2), {
   string: ["file"],
 });
 
+function streamComplate(stream) {
+  return new Promise(function c(res) {
+    stream.on("end", res);
+  });
+}
+
 const BASE_PATH = path.resolve(process.env.BASE_PATH || __dirname);
 
 var OUTFILE = path.join(BASE_PATH, "out.txt");
@@ -27,14 +33,20 @@ if (args.help) {
   processFile(process.stdin);
 } else if (args.file) {
   let stream = fs.createReadStream(path.join(BASE_PATH, args.file), "utf8");
-  processFile(stream);
+  processFile(stream)
+    .then(function () {
+      console.log("\ndone");
+    })
+    .catch(function (err) {
+      error(err.toString(), true);
+    });
 } else {
   error("Incorrect usage", true);
 }
 
 // ***********************************************
 
-function processFile(inStream) {
+async function processFile(inStream) {
   var outStream = inStream;
 
   if (args.uncompress) {
@@ -63,7 +75,10 @@ function processFile(inStream) {
   } else {
     targetStream = fs.createWriteStream(OUTFILE);
   }
+
   outStream.pipe(targetStream);
+
+  await streamComplate(outStream);
 }
 
 function printHelp() {
