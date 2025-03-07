@@ -34,12 +34,32 @@ var SQL3 = {
   exec: util.promisify(myDB.exec.bind(myDB)),
 };
 
-// var fileServer = new staticAlias.Server(WEB_PATH,{
-// 	cache: 100,
-// 	serverInfo: "Node Workshop: ex5",
-// 	alias: [
-// 	],
-// });
+var fileServer = new staticAlias.Server(WEB_PATH, {
+  cache: 100,
+  serverInfo: "Rezis server in action",
+  alias: [
+    {
+      match: /^\/(?:index\/?)?(?:[?#].*$)?$/,
+      serve: "index.html",
+      force: true,
+    },
+    {
+      match: /^\/js\/.+$/,
+      serve: "<% absPath %>",
+      force: true,
+    },
+    {
+      match: /^\/(?:[\w\d]+)(?:[\/?#].*$)?$/,
+      serve: function onMatch(params) {
+        return `${params.basename}.html`;
+      },
+    },
+    {
+      match: /[^]/,
+      serve: "404.html",
+    },
+  ],
+});
 
 var httpserv = http.createServer(handleRequest);
 
@@ -53,12 +73,12 @@ function main() {
 }
 
 async function handleRequest(req, res) {
-  if (req.url === "/hello") {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("Hello, world!");
-  } else {
-    res.writeHead(404);
-    res.end("Not found");
+  try {
+    fileServer.serve(req, res);
+  } catch (err) {
+    console.error(err);
+    res.writeHead(500, { "Content-Type": "text/plain" });
+    res.end("Internal server error");
   }
 }
 
