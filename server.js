@@ -73,12 +73,16 @@ function main() {
 }
 
 async function handleRequest(req, res) {
-  try {
+  if (req.url === "/get-records") {
+    await delay(1000);
+    const records = await getAllRecords();
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    });
+    res.end(JSON.stringify(records));
+  } else {
     fileServer.serve(req, res);
-  } catch (err) {
-    console.error(err);
-    res.writeHead(500, { "Content-Type": "text/plain" });
-    res.end("Internal server error");
   }
 }
 
