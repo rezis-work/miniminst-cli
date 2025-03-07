@@ -9,6 +9,9 @@ import sqlite3 from "sqlite3";
 import staticAlias from "node-static-alias";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import express from "express";
+
+var app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const DB_PATH = path.join(dirname(__filename), "my.db");
@@ -61,15 +64,27 @@ var fileServer = new staticAlias.Server(WEB_PATH, {
   ],
 });
 
-var httpserv = http.createServer(handleRequest);
+var httpserv = http.createServer(app);
 
 main();
 
 // ************************************
 
 function main() {
+  defineRoutes();
   httpserv.listen(HTTP_PORT);
   console.log(`Listening on http://localhost:${HTTP_PORT}...`);
+}
+
+function defineRoutes() {
+  app.get("/get-records", async function (req, res) {
+    var records = await getAllRecords();
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-cache",
+    });
+    res.end(JSON.stringify(records));
+  });
 }
 
 async function handleRequest(req, res) {
