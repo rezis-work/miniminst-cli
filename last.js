@@ -17,8 +17,19 @@ main().catch(() => 1);
 // ************************************
 
 async function main() {
-  var child = childProc.spawn("node", ["last-child.js"]);
-  child.on("exit", function (code) {
-    console.log("last-child.js exited with code", code);
-  });
+  console.log(`Load testing http://localhost:${HTTP_PORT}...`);
+  for ()
+
+  while (true) {
+    process.stdout.write(`Trying ${MAX_CHILDREN} child processes...`);
+
+    var child = childProc.spawn("node", ["last-child.js"]);
+    child.on("exit", function (code) {
+      //  code == 0
+    });
+
+    console.log("done");
+
+    await delay(500);
+  }
 }
