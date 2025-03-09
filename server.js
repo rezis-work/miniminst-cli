@@ -101,10 +101,6 @@ async function handleRequest(req, res) {
   }
 }
 
-// *************************
-// NOTE: if sqlite3 is not working for you,
-//   comment this version out
-// *************************
 async function getAllRecords() {
   var result = await SQL3.all(
     `
@@ -121,16 +117,3 @@ async function getAllRecords() {
 
   return result;
 }
-
-// *************************
-// NOTE: uncomment and use this version if
-//   sqlite3 is not working for you
-// *************************
-// async function getAllRecords() {
-// 	// fake DB results returned
-// 	return [
-// 		{ something: 53988400, other: "hello" },
-// 		{ something: 342383991, other: "hello" },
-// 		{ something: 7367746, other: "world" },
-// 	];
-// }
