@@ -87,19 +87,14 @@ function defineRoutes() {
   });
 }
 
-async function handleRequest(req, res) {
-  if (req.url === "/get-records") {
-    await delay(1000);
-    const records = await getAllRecords();
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache",
-    });
-    res.end(JSON.stringify(records));
-  } else {
-    fileServer.serve(req, res);
-  }
-}
+app.use(
+  express.static(WEB_PATH, {
+    maxAge: 10,
+    setHeaders: (res) => {
+      res.setHeader("Server", "Rezis server in action");
+    },
+  })
+);
 
 async function getAllRecords() {
   var result = await SQL3.all(
