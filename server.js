@@ -4,7 +4,7 @@
 
 import util from "util";
 import http from "http";
-import path from "path";
+import path, { basename } from "path";
 import sqlite3 from "sqlite3";
 import staticAlias from "node-static-alias";
 import { fileURLToPath } from "url";
@@ -78,6 +78,7 @@ function main() {
 
 function defineRoutes() {
   app.get("/get-records", async function (req, res) {
+    await delay(1000);
     var records = await getAllRecords();
     res.writeHead(200, {
       "Content-Type": "application/json",
@@ -86,6 +87,21 @@ function defineRoutes() {
     res.end(JSON.stringify(records));
   });
 }
+
+app.use(function (req, res, next) {
+  if (/^\/(?:index\/?)?(?:[?#].*$)?$/.test(req.url)) {
+    req.url = "/index.html";
+  } else if (/^\/js\/.+/.test(req.url)) {
+    next();
+    return;
+  } else if (/^\/(?:[\w\d]+)(?:[?#].*$)?$/.test(req.url)) {
+    let basename = req.url.match(/^\/(?:[\w\d]+)/)[0];
+    req.url = `${basename}.html`;
+  } else {
+    res.url = "/404.html";
+  }
+  next();
+});
 
 app.use(
   express.static(WEB_PATH, {
